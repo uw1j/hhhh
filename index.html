@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#0a0e27">
+<title>NEXUS STUDIO</title>
+
+<!-- مكتبات خارجية (اختيارية - تحتاج إنترنت) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" onerror="console.warn('CodeMirror CSS offline')">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onerror="console.warn('FA offline')">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/php/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+
+<style>
+/* ============ المتغيرات والثيمات ============ */
+:root {
+  --bg-primary: #0a0e27;
+  --bg-secondary: #11162e;
+  --bg-tertiary: #1a2145;
+  --bg-card: #151b38;
+  --bg-hover: #1e2547;
+  --border: #2a3158;
+  --text-primary: #e8ecff;
+  --text-secondary: #9aa4cc;
+  --text-muted: #636b94;
+  --accent-violet: #8b5cf6;
+  --accent-violet-2: #a78bfa;
+  --accent-mint: #34d399;
+  --accent-navy: #0a0e27;
+  --accent-danger: #ef4444;
+  --accent-warn: #f59e0b;
+  --accent-info: #3b82f6;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --font-family: 'Segoe UI', 'Tahoma', 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-size: 14px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f7ff;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef1fb;
+  --bg-card: #ffffff;
+  --bg-hover: #e8ecfb;
+  --border: #d8ddf0;
+  --text-primary: #0a0e27;
+  --text-secondary: #4a5178;
+  --text-muted: #8891b5;
+  --shadow: 0 8px 32px rgba(10,14,39,0.12);
+  --shadow-sm: 0 2px 8px rgba(10,14,39,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ============ شريط الجانب ============ */
+.app {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  grid-template-rows: 56px 1fr 26px;
+  height: 100vh;
+  grid-template-areas:
+    "sidebar topbar"
+    "sidebar main"
+    "sidebar statusbar";
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background: var(--bg-secondary);
+  border-inline-end: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 4px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.logo {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-violet), var(--accent-mint));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px; color: #fff;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+  letter-spacing: -1px;
+}
+
+.nav-btn {
+  width: 46px; height: 46px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all var(--transition);
+  position: relative;
+}
+.nav-btn:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateY(-2px); }
+.nav-btn.active { background: linear-gradient(135deg, var(--accent-violet), var(--accent-violet-2)); color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.4); }
+.nav-btn .tooltip {
+  position: absolute; inset-inline-start: 100%; margin-inline-start: 10px;
+  background: var(--bg-tertiary); color: var(--text-primary);
+  padding: 6px 10px; border-radius: 6px; font-size: 12px;
+  white-space: nowrap; opacity: 0; pointer-events: none;
+  transition: opacity var(--transition); border: 1px solid var(--border);
+  z-index: 1000;
+}
+.nav-btn:hover .tooltip { opacity: 1; }
+
+/* ============ الشريط العلوي ============ */
+.topbar {
+  grid-area: topbar;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 50;
+}
+.topbar-title {
+  font-weight: 700; font-size: 15px;
+  background: linear-gradient(90deg, var(--accent-violet-2), var(--accent-mint));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.topbar-spacer { flex: 1; }
+.topbar-btn {
+  height: 36px; min-width: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-family: inherit;
+  transition: all var(--transition);
+}
+.topbar-btn:hover { background: var(--bg-hover); border-color: var(--accent-violet); }
+.topbar-btn.primary { background: linear-gradient(135deg, var(--accent-violet), var(--accent-violet-2)); border: none; color: #fff; }
+.topbar-btn.primary:hover { box-shadow: 0 4px 20px rgba(139,92,246,0.5); transform: translateY(-1px); }
+
+/* ============ المحتوى الرئيسي ============ */
+.main {
+  grid-area: main;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-primary);
+}
+.view {
+  position: absolute; inset: 0;
+  padding: 20px;
+  overflow-y: auto;
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============ شريط الحالة ============ */
+.statusbar {
+  grid-area: statusbar;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 16px;
+  font-size: 11px; color: var(--text-muted);
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-mint);
+  display: inline-block; margin-inline-end: 6px;
+  box-shadow: 0 0 8px var(--accent-mint);
+}
+.status-dot.busy { background: var(--accent-warn); box-shadow: 0 0 8px var(--accent-warn); animation: pulse 1s infinite; }
+.status-dot.error { background: var(--accent-danger); box-shadow: 0 0 8px var(--accent-danger); }
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+/* ============ العناصر العامة ============ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: all var(--transition);
+}
+.card:hover { border-color: var(--accent-violet); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+.section-title {
+  font-size: 22px; font-weight: 700;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title i { color: var(--accent-violet-2); }
+.section-sub { color: var(--text-secondary); margin-bottom: 20px; font-size: 13px; }
+
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+.btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit; font-size: 13px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg-hover); border-color: var(--accent-violet); }
+.btn:active { transform: scale(0.97); }
+.btn.primary { background: linear-gradient(135deg, var(--accent-violet), var(--accent-violet-2)); border: none; color: #fff; }
+.btn.primary:hover { box-shadow: 0 4px 20px rgba(139,92,246,0.4); }
+.btn.mint { background: linear-gradient(135deg, var(--accent-mint), #10b981); border: none; color: #06251c; }
+.btn.danger { background: var(--accent-danger); border: none; color: #fff; }
+.btn.sm { padding: 6px 10px; font-size: 12px; }
+.btn.icon { padding: 8px; min-width: 34px; justify-content: center; }
+
+.input, select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text-primary);
+  font-family: inherit; font-size: 13px;
+  outline: none;
+  transition: all var(--transition);
+}
+.input:focus, select:focus, textarea:focus { border-color: var(--accent-violet); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
+
+/* ============ الرئيسية ============ */
+.hero {
+  background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(52,211,153,0.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%);
+  top: -100px; inset-inline-start: -100px;
+  pointer-events: none;
+}
+.hero h1 { font-size: 30px; margin-bottom: 8px; position: relative; z-index: 1; }
+.hero h1 span { background: linear-gradient(90deg, var(--accent-violet-2), var(--accent-mint)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--text-secondary); max-width: 620px; position: relative; z-index: 1; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+
+.action-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: all var(--transition);
+  position: relative; overflow: hidden;
+}
+.action-card:hover { border-color: var(--accent-violet); transform: translateY(-3px); }
+.action-card .ic {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(52,211,153,0.15));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent-violet-2); font-size: 18px;
+}
+.action-card h3 { font-size: 15px; }
+.action-card p { font-size: 12px; color: var(--text-secondary); }
+
+/* ============ الكود لاب ============ */
+.codelab {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 40px 1fr;
+  gap: 0;
+}
+.file-tree {
+  grid-row: 1 / -1;
+  background: var(--bg-secondary);
+  border-inline-end: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 8px;
+  display: flex; flex-direction: column;
+}
+.file-tree-header { display: flex; gap: 4px; margin-bottom: 8px; padding: 4px; }
+.file-tree-header .btn { flex: 1; padding: 6px; font-size: 11px; }
+.file-item {
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex; align-items: center; gap: 6px;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+.file-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.file-item.active { background: rgba(139,92,246,0.15); color: var(--accent-violet-2); }
+.file-item .del { margin-inline-start: auto; opacity: 0; color: var(--accent-danger); font-size: 11px; }
+.file-item:hover .del { opacity: 1; }
+
+.editor-toolbar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 8px; gap: 6px;
+  overflow-x: auto;
+}
+.editor-toolbar .btn { padding: 5px 8px; font-size: 11px; }
+
+.editor-tabs {
+  display: flex; gap: 2px; overflow-x: auto;
+  flex: 1;
+}
+.tab {
+  padding: 6px 12px; font-size: 12px;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-secondary); border-radius: 6px 6px 0 0;
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.tab.active { background: var(--bg-primary); color: var(--text-primary); border-bottom: 2px solid var(--accent-violet); }
+.tab .close { opacity: 0.6; font-size: 10px; }
+.tab .close:hover { opacity: 1; color: var(--accent-danger); }
+
+.editor-area { position: relative; background: var(--bg-primary); overflow: hidden; }
+.CodeMirror { height: 100% !important; font-size: 13px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; }
+.CodeMirror-gutters { background: var(--bg-secondary) !important; border-color: var(--border) !important; }
+
+.preview-pane {
+  position: absolute; top: 0; inset-inline-end: 0; bottom: 0;
+  width: 45%; min-width: 240px; max-width: 75%;
+  background: #fff; border-inline-start: 2px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 10;
+  transition: transform var(--transition);
+}
+.preview-pane.hidden { transform: translateX(110%); }
+[dir="rtl"] .preview-pane.hidden { transform: translateX(-110%); }
+.preview-header {
+  background: var(--bg-secondary); color: var(--text-primary);
+  padding: 6px 10px; display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.preview-iframe { flex: 1; border: none; background: #fff; }
+
+.console-pane {
+  background: var(--bg-secondary); border-top: 1px solid var(--border);
+  padding: 8px; font-family: 'Consolas', monospace; font-size: 12px;
+  height: 150px; overflow-y: auto;
+  display: none;
+}
+.console-pane.show { display: block; }
+.console-line { padding: 2px 6px; border-inline-start: 3px solid transparent; }
+.console-line.log { border-color: var(--accent-info); }
+.console-line.warn { border-color: var(--accent-warn); color: var(--accent-warn); }
+.console-line.error { border-color: var(--accent-danger); color: var(--accent-danger); }
+
+.resizer {
+  position: absolute; inset-inline-start: -3px; top: 0; bottom: 0;
+  width: 6px; cursor: col-resize; background: transparent;
+}
+.resizer:hover { background: var(--accent-violet); }
+
+/* ============ Image Lab ============ */
+.imagelab {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  overflow: hidden;
+}
+.il-tools {
+  background: var(--bg-secondary);
+  border-inline-end: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 10px;
+}
+.il-tools .tool-section {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+.il-tools .tool-section h4 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+.tool-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.tool-btn {
+  padding: 10px 6px; background: var(--bg-tertiary);
+  border: 1px solid var(--border); border-radius: 8px;
+  cursor: pointer; font-size: 11px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  color: var(--text-primary); font-family: inherit;
+  transition: all var(--transition);
+}
+.tool-btn:hover { border-color: var(--accent-violet); background: var(--bg-hover); }
+.tool-btn.active { background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(52,211,153,0.15)); border-color: var(--accent-violet); }
+.tool-btn i { font-size: 15px; color: var(--accent-violet-2); }
+
+.canvas-wrap {
+  background: 
+    linear-gradient(45deg, #2a3158 25%, transparent 25%),
+    linear-gradient(-45deg, #2a3158 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #2a3158 75%),
+    linear-gradient(-45deg, transparent 75%, #2a3158 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #1a2145;
+  overflow: auto;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+#ilCanvas {
+  background: #fff;
+  box-shadow: var(--shadow);
+  max-width: 95%; max-height: 95%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.layers-list {
+  display: flex; flex-direction: column; gap: 4px;
+  max-height: 200px; overflow-y: auto;
+}
+.layer-item {
+  padding: 6px 8px; background: var(--bg-tertiary);
+  border-radius: 6px; font-size: 12px;
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer;
+}
+.layer-item.active { background: rgba(139,92,246,0.2); border: 1px solid var(--accent-violet); }
+.layer-item .lname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============ الإعدادات والمساعدة ============ */
+.settings-group {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  margin-bottom: 14px;
+}
+.settings-group h3 { font-size: 15px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.settings-group h3 i { color: var(--accent-violet-2); }
+
+.help-section {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 14px;
+}
+.help-section h3 { margin-bottom: 10px; color: var(--accent-violet-2); }
+.help-section code {
+  background: var(--bg-tertiary); padding: 2px 6px;
+  border-radius: 4px; font-family: monospace; font-size: 12px;
+  color: var(--accent-mint);
+}
+
+/* ============ التوست ============ */
+.toast-container {
+  position: fixed; top: 70px; inset-inline-end: 16px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--accent-violet);
+  padding: 12px 16px; border-radius: 10px;
+  box-shadow: var(--shadow); min-width: 240px;
+  animation: slideIn 0.3s ease;
+  font-size: 13px;
+}
+.toast.success { border-inline-start-color: var(--accent-mint); }
+.toast.error { border-inline-start-color: var(--accent-danger); }
+.toast.warn { border-inline-start-color: var(--accent-warn); }
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } }
+
+/* ============ المودال ============ */
+.modal-back {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 5000; display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-back.show { display: flex; }
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 22px; max-width: 480px; width: 100%;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.25s ease;
+}
+.modal h3 { margin-bottom: 12px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* ============ الموبايل ============ */
+.mobile-menu-btn { display: none; }
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px 1fr 26px;
+    grid-template-areas:
+      "topbar"
+      "main"
+      "statusbar";
+  }
+  .sidebar {
+    position: fixed; top: 56px; bottom: 26px;
+    inset-inline-start: 0; width: 68px;
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    z-index: 200;
+  }
+  [dir="rtl"] .sidebar { transform: translateX(100%); inset-inline-start: 0; inset-inline-end: auto; }
+  .sidebar.open { transform: translateX(0) !important; }
+  .mobile-menu-btn { display: inline-flex; }
+
+  .codelab { grid-template-columns: 1fr; }
+  .file-tree { position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 220px; z-index: 30; transform: translateX(-100%); transition: transform var(--transition); }
+  [dir="rtl"] .file-tree { transform: translateX(100%); inset-inline-start: auto; inset-inline-end: 0; border-inline-start: 1px solid var(--border); border-inline-end: none; }
+  .file-tree.open { transform: translateX(0); }
+
+  .preview-pane { width: 100% !important; max-width: 100%; }
+
+  .imagelab { grid-template-columns: 1fr; }
+  .il-tools { max-height: 45vh; border-inline-end: none; border-bottom: 1px solid var(--border); }
+
+  .hero h1 { font-size: 22px; }
+  .section-title { font-size: 18px; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-violet); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">NX</div>
+    <button class="nav-btn active" data-view="home" title="الرئيسية"><i class="fas fa-home"></i><span class="tooltip">الرئيسية</span></button>
+    <button class="nav-btn" data-view="codelab" title="Code Lab"><i class="fas fa-code"></i><span class="tooltip">Code Lab</span></button>
+    <button class="nav-btn" data-view="imagelab" title="Image Lab"><i class="fas fa-image"></i><span class="tooltip">Image Lab</span></button>
+    <button class="nav-btn" data-view="projects" title="المشاريع"><i class="fas fa-folder"></i><span class="tooltip">المشاريع</span></button>
+    <button class="nav-btn" data-view="settings" title="الإعدادات"><i class="fas fa-cog"></i><span class="tooltip">الإعدادات</span></button>
+    <button class="nav-btn" data-view="help" title="المساعدة"><i class="fas fa-question-circle"></i><span class="tooltip">المساعدة</span></button>
+  </aside>
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <button class="topbar-btn mobile-menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <span class="topbar-title">NEXUS STUDIO</span>
+    <div class="topbar-spacer"></div>
+    <button class="topbar-btn" id="langBtn" title="تغيير اللغة"><i class="fas fa-language"></i> <span id="langLabel">AR</span></button>
+    <button class="topbar-btn" id="themeBtn" title="تبديل الثيم"><i class="fas fa-moon"></i></button>
+    <button class="topbar-btn primary" id="saveAllBtn"><i class="fas fa-save"></i> <span data-i18n="save">حفظ</span></button>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main" id="main">
+
+    <!-- ==== Home ==== -->
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <h1>مرحباً بك في <span>NEXUS STUDIO</span></h1>
+        <p>استوديو متكامل للبرمجة والتصميم في متصفحك. محرر أكواد احترافي، محرر صور، معاينة حية، وإدارة مشاريع كاملة - كل ذلك بدون تثبيت، ويعمل محلياً.</p>
+      </div>
+
+      <div class="quick-actions">
+        <div class="action-card" data-action="new-project">
+          <div class="ic"><i class="fas fa-plus"></i></div>
+          <h3>مشروع جديد</h3>
+          <p>ابدأ بإنشاء مشروع ويب أو كود</p>
+        </div>
+        <div class="action-card" data-action="open-project">
+          <div class="ic"><i class="fas fa-folder-open"></i></div>
+          <h3>فتح مشروع</h3>
+          <p>من مشاريعك المحفوظة</p>
+        </div>
+        <div class="action-card" data-action="import-files">
+          <div class="ic"><i class="fas fa-file-import"></i></div>
+          <h3>استيراد ملفات</h3>
+          <p>اسحب ملفاتك أو اخترها</p>
+        </div>
+        <div class="action-card" data-action="go-codelab">
+          <div class="ic"><i class="fas fa-code"></i></div>
+          <h3>محرر الأكواد</h3>
+          <p>Code Lab المتقدم</p>
+        </div>
+        <div class="action-card" data-action="go-imagelab">
+          <div class="ic"><i class="fas fa-palette"></i></div>
+          <h3>محرر الصور</h3>
+          <p>Image Lab للتصميم</p>
+        </div>
+        <div class="action-card" data-action="go-settings">
+          <div class="ic"><i class="fas fa-sliders-h"></i></div>
+          <h3>الإعدادات</h3>
+          <p>خصّص تجربتك</p>
+        </div>
+      </div>
+
+      <h2 class="section-title"><i class="fas fa-clock"></i> المشاريع الأخيرة</h2>
+      <p class="section-sub">آخر ما عملت عليه</p>
+      <div class="grid grid-3" id="recentProjects">
+        <div class="card" style="text-align:center; color: var(--text-muted); padding: 32px;">
+          <i class="fas fa-inbox" style="font-size: 32px; margin-bottom: 10px; opacity: 0.5;"></i>
+          <p>لا توجد مشاريع بعد</p>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 28px;"><i class="fas fa-star"></i> مميزات الاستوديو</h2>
+      <div class="grid grid-3">
+        <div class="card"><h3><i class="fas fa-code" style="color: var(--accent-violet-2);"></i> محرر متقدم</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">دعم 15+ لغة برمجة مع تلوين وأدوات احترافية</p></div>
+        <div class="card"><h3><i class="fas fa-play" style="color: var(--accent-mint);"></i> تشغيل حقيقي</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">شغّل HTML/CSS/JS و Python فعلياً</p></div>
+        <div class="card"><h3><i class="fas fa-image" style="color: var(--accent-warn);"></i> محرر صور</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">تصميم وطبقات وفلاتر وتصدير</p></div>
+        <div class="card"><h3><i class="fas fa-shield-alt" style="color: var(--accent-info);"></i> خصوصية تامة</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">ملفاتك تُعالج محلياً في متصفحك</p></div>
+        <div class="card"><h3><i class="fas fa-mobile-alt" style="color: var(--accent-violet-2);"></i> متجاوب</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">يعمل على الهاتف والتابلت والكمبيوتر</p></div>
+        <div class="card"><h3><i class="fas fa-cloud" style="color: var(--accent-mint);"></i> حفظ تلقائي</h3><p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">IndexedDB يحفظ عملك تلقائياً</p></div>
+      </div>
+    </section>
+
+    <!-- ==== Code Lab ==== -->
+    <section class="view" id="view-codelab" style="padding:0;">
+      <div class="codelab">
+        <aside class="file-tree" id="fileTree">
+          <div class="file-tree-header">
+            <button class="btn sm" id="newFileBtn"><i class="fas fa-file"></i></button>
+            <button class="btn sm" id="newFolderBtn"><i class="fas fa-folder-plus"></i></button>
+            <button class="btn sm" id="importFileBtn"><i class="fas fa-upload"></i></button>
+          </div>
+          <div id="fileList"></div>
+        </aside>
+
+        <div class="editor-toolbar" style="grid-column: 2;">
+          <button class="btn sm" id="toggleTreeBtn" style="display:none;"><i class="fas fa-bars"></i></button>
+          <div class="editor-tabs" id="tabs"></div>
+          <button class="btn sm" id="runBtn" title="تشغيل"><i class="fas fa-play"></i> Run</button>
+          <button class="btn sm" id="togglePreviewBtn" title="المعاينة"><i class="fas fa-eye"></i></button>
+          <button class="btn sm" id="toggleConsoleBtn" title="Console"><i class="fas fa-terminal"></i></button>
+          <button class="btn sm" id="saveFileBtn" title="حفظ"><i class="fas fa-save"></i></button>
+          <button class="btn sm" id="downloadFileBtn" title="تنزيل"><i class="fas fa-download"></i></button>
+          <button class="btn sm" id="searchBtn" title="بحث"><i class="fas fa-search"></i></button>
+          <select id="langSelect" style="width: auto; padding: 4px 8px; font-size: 11px;">
+            <option value="auto">Auto</option>
+            <option value="htmlmixed">HTML</option>
+            <option value="css">CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="text/typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="text/x-java">Java</option>
+            <option value="text/x-csrc">C</option>
+            <option value="text/x-c++src">C++</option>
+            <option value="text/x-csharp">C#</option>
+            <option value="php">PHP</option>
+            <option value="sql">SQL</option>
+            <option value="application/json">JSON</option>
+            <option value="xml">XML</option>
+            <option value="markdown">Markdown</option>
+            <option value="go">Go</option>
+            <option value="rust">Rust</option>
+            <option value="text/x-kotlin">Kotlin</option>
+          </select>
+        </div>
+
+        <div class="editor-area" style="grid-column: 2; position: relative;">
+          <textarea id="codeEditor"></textarea>
+          <div class="console-pane" id="consolePane"></div>
+
+          <div class="preview-pane hidden" id="previewPane">
+            <div class="preview-header">
+              <i class="fas fa-globe"></i>
+              <span style="flex:1;">معاينة حية</span>
+              <button class="btn sm" id="refreshPreview"><i class="fas fa-sync-alt"></i></button>
+              <button class="btn sm" id="closePreview"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe class="preview-iframe" id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== Image Lab ==== -->
+    <section class="view" id="view-imagelab" style="padding:0;">
+      <div class="imagelab">
+        <aside class="il-tools">
+          <div class="tool-section">
+            <h4>ملف</h4>
+            <div class="tool-grid">
+              <button class="tool-btn" id="ilImport"><i class="fas fa-upload"></i>استيراد</button>
+              <button class="tool-btn" id="ilNew"><i class="fas fa-file"></i>جديد</button>
+              <button class="tool-btn" id="ilExportPng"><i class="fas fa-download"></i>PNG</button>
+              <button class="tool-btn" id="ilExportJpg"><i class="fas fa-download"></i>JPG</button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4>إضافة</h4>
+            <div class="tool-grid">
+              <button class="tool-btn" id="ilAddText"><i class="fas fa-font"></i>نص</button>
+              <button class="tool-btn" id="ilAddRect"><i class="fas fa-square"></i>مستطيل</button>
+              <button class="tool-btn" id="ilAddCircle"><i class="fas fa-circle"></i>دائرة</button>
+              <button class="tool-btn" id="ilAddTriangle"><i class="fas fa-play"></i>مثلث</button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4>تعديل</h4>
+            <div class="field"><label>اللون</label><input type="color" class="input" id="ilColor" value="#8b5cf6"></div>
+            <div class="field"><label>حجم الخط</label><input type="range" min="8" max="120" value="24" id="ilFontSize" class="input"></div>
+            <div class="field"><label>الشفافية</label><input type="range" min="0" max="100" value="100" id="ilOpacity" class="input"></div>
+            <div class="field"><label>السطوع</label><input type="range" min="0" max="200" value="100" id="ilBrightness" class="input"></div>
+            <div class="field"><label>التدوير</label><input type="range" min="-180" max="180" value="0" id="ilRotate" class="input"></div>
+          </div>
+
+          <div class="tool-section">
+            <h4>الطبقات</h4>
+            <div class="layers-list" id="ilLayers"></div>
+            <div class="tool-grid" style="margin-top:6px;">
+              <button class="tool-btn" id="ilLayerUp"><i class="fas fa-arrow-up"></i>فوق</button>
+              <button class="tool-btn" id="ilLayerDown"><i class="fas fa-arrow-down"></i>تحت</button>
+              <button class="tool-btn" id="ilLayerDup"><i class="fas fa-copy"></i>نسخ</button>
+              <button class="tool-btn" id="ilLayerDel"><i class="fas fa-trash"></i>حذف</button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4>قوالب</h4>
+            <div class="tool-grid">
+              <button class="tool-btn il-tpl" data-tpl="youtube"><i class="fab fa-youtube"></i>يوتيوب</button>
+              <button class="tool-btn il-tpl" data-tpl="insta"><i class="fab fa-instagram"></i>إنستا</button>
+              <button class="tool-btn il-tpl" data-tpl="poster"><i class="fas fa-image"></i>بوستر</button>
+              <button class="tool-btn il-tpl" data-tpl="logo"><i class="fas fa-shapes"></i>شعار</button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4>سجل</h4>
+            <div class="tool-grid">
+              <button class="tool-btn" id="ilUndo"><i class="fas fa-undo"></i>تراجع</button>
+              <button class="tool-btn" id="ilRedo"><i class="fas fa-redo"></i>إعادة</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="ilCanvas" width="800" height="500"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== Projects ==== -->
+    <section class="view" id="view-projects">
+      <h2 class="section-title"><i class="fas fa-folder"></i> إدارة المشاريع</h2>
+      <p class="section-sub">مشاريعك المحفوظة في المتصفح</p>
+      <div style="margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn primary" id="pmNew"><i class="fas fa-plus"></i> مشروع جديد</button>
+        <button class="btn" id="pmBackup"><i class="fas fa-download"></i> نسخة احتياطية</button>
+        <button class="btn" id="pmRestore"><i class="fas fa-upload"></i> استعادة</button>
+      </div>
+      <div class="grid grid-3" id="projectsGrid"></div>
+    </section>
+
+    <!-- ==== Settings ==== -->
+    <section class="view" id="view-settings">
+      <h2 class="section-title"><i class="fas fa-cog"></i> الإعدادات</h2>
+      <p class="section-sub">خصّص تجربتك في NEXUS STUDIO</p>
+
+      <div class="settings-group">
+        <h3><i class="fas fa-language"></i> اللغة والاتجاه</h3>
+        <div class="field">
+          <label>لغة الواجهة</label>
+          <select id="setLang">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3><i class="fas fa-palette"></i> المظهر</h3>
+        <div class="field">
+          <label>الوضع</label>
+          <select id="setTheme">
+            <option value="dark">داكن</option>
+            <option value="light">فاتح</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>اللون الأساسي</label>
+          <input type="color" id="setAccent" value="#8b5cf6" class="input">
+        </div>
+        <div class="field">
+          <label>اللون الثانوي (Mint)</label>
+          <input type="color" id="setAccent2" value="#34d399" class="input">
+        </div>
+        <div class="field">
+          <label>لون الخلفية</label>
+          <input type="color" id="setBg" value="#0a0e27" class="input">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3><i class="fas fa-font"></i> النصوص</h3>
+        <div class="field">
+          <label>حجم الخط (px)</label>
+          <input type="range" min="12" max="20" value="14" id="setFontSize" class="input">
+        </div>
+        <div class="field">
+          <label>نوع الخط</label>
+          <select id="setFont">
+            <option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option>
+            <option value="'Cairo', sans-serif">Cairo</option>
+            <option value="'Tajawal', sans-serif">Tajawal</option>
+            <option value="system-ui, sans-serif">System UI</option>
+            <option value="'Consolas', monospace">Monospace</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3><i class="fas fa-code"></i> المحرر</h3>
+        <div class="field">
+          <label>حجم خط المحرر</label>
+          <input type="range" min="11" max="20" value="13" id="setEditorSize" class="input">
+        </div>
+        <div class="field">
+          <label>Theme المحرر</label>
+          <select id="setEditorTheme">
+            <option value="material-darker">Material Darker</option>
+            <option value="default">Default</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3><i class="fas fa-database"></i> الحفظ</h3>
+        <div class="field" style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="setAutoSave" checked style="width:auto;">
+          <label for="setAutoSave" style="margin:0;">حفظ تلقائي</label>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <button class="btn danger" id="clearAllData"><i class="fas fa-trash"></i> مسح كل البيانات</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== Help ==== -->
+    <section class="view" id="view-help">
+      <h2 class="section-title"><i class="fas fa-question-circle"></i> المساعدة</h2>
+      <p class="section-sub">دليل شامل لاستخدام NEXUS STUDIO</p>
+
+      <div class="help-section">
+        <h3>🚀 البدء السريع</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          من الصفحة الرئيسية يمكنك إنشاء مشروع جديد، أو فتح مشروع محفوظ، أو استيراد ملفاتك.
+          اختر <code>Code Lab</code> من القائمة الجانبية لبدء كتابة الأكواد، أو <code>Image Lab</code> للتصميم.
+        </p>
+      </div>
+
+      <div class="help-section">
+        <h3>💻 Code Lab - اللغات المدعومة</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          <strong style="color: var(--accent-mint);">✅ لغات قابلة للتشغيل فعلياً:</strong><br>
+          • <code>HTML</code> + <code>CSS</code> + <code>JavaScript</code> — تُشغَّل مباشرة في المعاينة الحية.<br>
+          • <code>Python</code> — يُشغَّل عبر Pyodide (يتطلب اتصال بالإنترنت أول مرة).<br><br>
+          <strong style="color: var(--accent-warn);">✏️ لغات للتحرير فقط (بدون تنفيذ):</strong><br>
+          TypeScript, Java, C, C++, C#, PHP, SQL, JSON, XML, Markdown, Go, Rust, Kotlin.<br>
+          هذه اللغات تحتاج مترجمات خارجية لا يمكن تشغيلها بالكامل داخل المتصفح.
+          عند محاولة تشغيلها ستظهر رسالة واضحة بالسبب.
+        </p>
+      </div>
+
+      <div class="help-section">
+        <h3>⌨️ اختصارات لوحة المفاتيح</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          <code>Ctrl+S</code> — حفظ الملف الحالي<br>
+          <code>Ctrl+N</code> — ملف جديد<br>
+          <code>Ctrl+F</code> — بحث داخل المحرر<br>
+          <code>Ctrl+H</code> — بحث واستبدال<br>
+          <code>Ctrl+/</code> — تعليق السطر<br>
+          <code>F5</code> أو <code>Ctrl+Enter</code> — تشغيل الكود<br>
+          <code>Ctrl+Z</code> — تراجع &nbsp; <code>Ctrl+Y</code> — إعادة
+        </p>
+      </div>
+
+      <div class="help-section">
+        <h3>🎨 Image Lab - نصائح</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          استورد صورة أو ابدأ بقماش فارغ. أضف نصوص وأشكال، نظّمها عبر الطبقات،
+          صدّر النتيجة بصيغة PNG أو JPG.
+        </p>
+      </div>
+
+      <div class="help-section">
+        <h3>🔒 الخصوصية والميزات التي تحتاج إنترنت</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          كل ملفاتك تُحفَظ محلياً في متصفحك (IndexedDB) ولا تُرسَل لأي خادم.<br>
+          <strong>ميزات تحتاج إنترنت:</strong> تحميل مكتبة CodeMirror، تحميل محرك Pyodide لتشغيل Python، تحميل أيقونات Font Awesome.<br>
+          إذا لم يتوفر إنترنت، سيعمل التطبيق بوضع احتياطي بسيط.
+        </p>
+      </div>
+
+      <div class="help-section">
+        <h3>❓ أسئلة شائعة</h3>
+        <p style="color: var(--text-secondary); line-height: 1.8;">
+          <strong>هل يمكن تشغيل Java أو C++؟</strong><br>
+          لا يمكن حالياً داخل المتصفح بدون خادم. يمكنك تحرير الأكواد وتنزيلها واستخدام محرر خارجي للتشغيل.<br><br>
+          <strong>أين تُحفظ ملفاتي؟</strong><br>
+          في IndexedDB داخل متصفحك على نفس الجهاز. استخدم "نسخة احتياطية" لنقلها بين الأجهزة.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ STATUS BAR ============ -->
+  <footer class="statusbar">
+    <span><span class="status-dot" id="statusDot"></span><span id="statusText">جاهز</span></span>
+    <span id="statusFile"></span>
+    <span id="statusPos" style="margin-inline-start: auto;"></span>
+    <span>NEXUS v1.0</span>
+  </footer>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+<input type="file" id="hiddenFileInput" multiple style="display:none;" accept="*/*">
+<input type="file" id="hiddenImageInput" style="display:none;" accept="image/*">
+
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* ==========================================================================
+   NEXUS STUDIO - Core Application
+   ========================================================================== */
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+/* ---------- State ---------- */
+const State = {
+  lang: 'ar',
+  theme: 'dark',
+  view: 'home',
+  projects: {},      // { id: {name, files: {name:content}, created, updated} }
+  currentProject: null,
+  openTabs: [],      // [{name, content, lang, dirty}]
+  activeTab: -1,
+  autoSave: true,
+  editorFontSize: 13,
+  settings: {
+    accent: '#8b5cf6',
+    accent2: '#34d399',
+    bg: '#0a0e27',
+    fontSize: 14,
+    font: "'Segoe UI', Tahoma, sans-serif",
+    editorTheme: 'material-darker'
+  }
+};
+
+/* ---------- i18n ---------- */
+const I18N = {
+  ar: { save: 'حفظ', ready: 'جاهز', saving: 'جاري الحفظ...', saved: 'تم الحفظ', error: 'خطأ', success: 'نجاح', warning: 'تحذير' },
+  en: { save: 'Save', ready: 'Ready', saving: 'Saving...', saved: 'Saved', error: 'Error', success: 'Success', warning: 'Warning' }
+};
+const t = (k) => (I18N[State.lang] && I18N[State.lang][k]) || I18N.ar[k] || k;
+
+/* ---------- Toast ---------- */
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+/* ---------- Status ---------- */
+function setStatus(txt, state = 'ok') {
+  $('#statusText').textContent = txt;
+  const dot = $('#statusDot');
+  dot.className = 'status-dot' + (state === 'busy' ? ' busy' : state === 'error' ? ' error' : '');
+}
+
+/* ---------- Modal ---------- */
+function showModal(html) {
+  $('#modalContent').innerHTML = html;
+  $('#modalBack').classList.add('show');
+}
+function closeModal() { $('#modalBack').classList.remove('show'); }
+$('#modalBack').addEventListener('click', e => { if (e.target.id === 'modalBack') closeModal(); });
+
+/* ---------- Navigation ---------- */
+function setView(name) {
+  State.view = name;
+  $$('.view').forEach(v => v.classList.remove('active'));
+  const view = $('#view-' + name);
+  if (view) view.classList.add('active');
+  $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  // close sidebar on mobile
+  if (window.innerWidth < 900) $('#sidebar').classList.remove('open');
+  // init components lazily
+  if (name === 'codelab' && window._initEditor) window._initEditor();
+  if (name === 'imagelab' && window._initImageLab) window._initImageLab();
+  if (name === 'projects') renderProjects();
+}
+$$('.nav-btn').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+$('#menuBtn').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+
+/* ---------- Theme & Settings ---------- */
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', State.theme);
+  document.body.style.fontFamily = State.settings.font;
+  document.documentElement.style.setProperty('--font-size', State.settings.fontSize + 'px');
+  document.documentElement.style.setProperty('--accent-violet', State.settings.accent);
+  document.documentElement.style.setProperty('--accent-violet-2', State.settings.accent);
+  document.documentElement.style.setProperty('--accent-mint', State.settings.accent2);
+  if (State.theme === 'dark') {
+    document.documentElement.style.setProperty('--bg-primary', State.settings.bg);
+  }
+}
+function applyLang() {
+  document.documentElement.lang = State.lang;
+  document.documentElement.dir = State.lang === 'ar' ? 'rtl' : 'ltr';
+  $('#langLabel').textContent = State.lang === 'ar' ? 'AR' : 'EN';
+  // Update some UI strings dynamically
+  $$('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (I18N[State.lang][k]) el.textContent = I18N[State.lang][k];
+  });
+}
+
+$('#themeBtn').addEventListener('click', () => {
+  State.theme = State.theme === 'dark' ? 'light' : 'dark';
+  $('#themeBtn').innerHTML = State.theme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+  applyTheme();
+  saveSettings();
+});
+$('#langBtn').addEventListener('click', () => {
+  State.lang = State.lang === 'ar' ? 'en' : 'ar';
+  applyLang();
+  saveSettings();
+});
+
+/* ---------- Settings UI bindings ---------- */
+function bindSettings() {
+  $('#setLang').value = State.lang;
+  $('#setTheme').value = State.theme;
+  $('#setAccent').value = State.settings.accent;
+  $('#setAccent2').value = State.settings.accent2;
+  $('#setBg').value = State.settings.bg;
+  $('#setFontSize').value = State.settings.fontSize;
+  $('#setFont').value = State.settings.font;
+  $('#setEditorSize').value = State.editorFontSize;
+  $('#setEditorTheme').value = State.settings.editorTheme;
+
+  $('#setLang').onchange = e => { State.lang = e.target.value; applyLang(); saveSettings(); };
+  $('#setTheme').onchange = e => { State.theme = e.target.value; applyTheme(); saveSettings(); };
+  $('#setAccent').oninput = e => { State.settings.accent = e.target.value; applyTheme(); saveSettings(); };
+  $('#setAccent2').oninput = e => { State.settings.accent2 = e.target.value; applyTheme(); saveSettings(); };
+  $('#setBg').oninput = e => { State.settings.bg = e.target.value; applyTheme(); saveSettings(); };
+  $('#setFontSize').oninput = e => { State.settings.fontSize = +e.target.value; applyTheme(); saveSettings(); };
+  $('#setFont').onchange = e => { State.settings.font = e.target.value; applyTheme(); saveSettings(); };
+  $('#setEditorSize').oninput = e => {
+    State.editorFontSize = +e.target.value;
+    if (window.cmEditor) document.querySelector('.CodeMirror').style.fontSize = State.editorFontSize + 'px';
+    saveSettings();
+  };
+  $('#setEditorTheme').onchange = e => {
+    State.settings.editorTheme = e.target.value;
+    if (window.cmEditor) window.cmEditor.setOption('theme', e.target.value);
+    saveSettings();
+  };
+  $('#setAutoSave').onchange = e => { State.autoSave = e.target.checked; saveSettings(); };
+  $('#clearAllData').onclick = () => {
+    showModal(`
+      <h3>مسح كل البيانات؟</h3>
+      <p style="color: var(--text-secondary);">سيتم حذف جميع المشاريع والملفات والإعدادات نهائياً. لا يمكن التراجع.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">إلغاء</button>
+        <button class="btn danger" onclick="wipeAll()">مسح الكل</button>
+      </div>
+    `);
+  };
+}
+window.wipeAll = async function() {
+  try {
+    await DB.clear();
+    localStorage.clear();
+    toast('تم مسح كل البيانات', 'success');
+    closeModal();
+    setTimeout(() => location.reload(), 800);
+  } catch(e) { toast('فشل المسح: ' + e.message, 'error'); }
+};
+
+function saveSettings() {
+  localStorage.setItem('nexus_settings', JSON.stringify({
+    lang: State.lang, theme: State.theme, settings: State.settings,
+    editorFontSize: State.editorFontSize, autoSave: State.autoSave
+  }));
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('nexus_settings') || '{}');
+    if (s.lang) State.lang = s.lang;
+    if (s.theme) State.theme = s.theme;
+    if (s.settings) Object.assign(State.settings, s.settings);
+    if (s.editorFontSize) State.editorFontSize = s.editorFontSize;
+    if (typeof s.autoSave === 'boolean') State.autoSave = s.autoSave;
+  } catch(e) {}
+}
+
+/* ==========================================================================
+   IndexedDB Layer
+   ========================================================================== */
+const DB = {
+  db: null,
+  async init() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('nexus_studio', 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+      };
+      req.onsuccess = e => { this.db = e.target.result; res(); };
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async saveProject(p) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('projects', 'readwrite');
+      tx.objectStore('projects').put(p);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async listProjects() {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('projects', 'readonly');
+      const req = tx.objectStore('projects').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async deleteProject(id) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('projects', 'readwrite');
+      tx.objectStore('projects').delete(id);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async getProject(id) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('projects', 'readonly');
+      const req = tx.objectStore('projects').get(id);
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async setKV(k, v) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('kv', 'readwrite');
+      tx.objectStore('kv').put(v, k);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async getKV(k) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('kv', 'readonly');
+      const req = tx.objectStore('kv').get(k);
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async clear() {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction(['projects','kv'], 'readwrite');
+      tx.objectStore('projects').clear();
+      tx.objectStore('kv').clear();
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  }
+};
+
+/* ==========================================================================
+   Code Lab
+   ========================================================================== */
+let cmEditor = null;
+let editorReady = false;
+
+function detectLang(filename) {
+  if (!filename) return 'javascript';
+  const ext = filename.split('.').pop().toLowerCase();
+  const map = {
+    html: 'htmlmixed', htm: 'htmlmixed', xhtml: 'htmlmixed',
+    css: 'css', scss: 'css', less: 'css',
+    js: 'javascript', mjs: 'javascript', cjs: 'javascript', jsx: 'javascript',
+    ts: 'text/typescript', tsx: 'text/typescript',
+    py: 'python',
+    java: 'text/x-java',
+    c: 'text/x-csrc', h: 'text/x-csrc',
+    cpp: 'text/x-c++src', cc: 'text/x-c++src', cxx: 'text/x-c++src', hpp: 'text/x-c++src',
+    cs: 'text/x-csharp',
+    php: 'php',
+    sql: 'sql',
+    json: 'application/json',
+    xml: 'xml', svg: 'xml',
+    md: 'markdown', markdown: 'markdown',
+    go: 'go',
+    rs: 'rust',
+    kt: 'text/x-kotlin', kts: 'text/x-kotlin',
+    txt: null
+  };
+  return map[ext] || 'javascript';
+}
+
+function getDefaultContent(lang) {
+  const def = {
+    htmlmixed: '<!DOCTYPE html>\n<html>\n<head>\n  <title>Nexus Demo</title>\n</head>\n<body>\n  <h1>مرحباً من NEXUS</h1>\n  <p>عدّل الكود ثم اضغط Run</p>\n</body>\n</html>',
+    css: 'body { font-family: sans-serif; background: #0a0e27; color: #fff; padding: 40px; }',
+    javascript: 'console.log("Hello from NEXUS STUDIO!");\n// اكتب كودك هنا\n',
+    python: 'print("مرحباً من NEXUS STUDIO")\nfor i in range(3):\n    print(i)',
+    default: '// ملف جديد\n'
+  };
+  return def[lang] || def.default;
+}
+
+function initEditor() {
+  if (editorReady) return;
+  if (typeof CodeMirror === 'undefined') {
+    toast('مكتبة CodeMirror غير متوفرة — وضع احتياطي', 'warn');
+    fallbackEditor();
+    editorReady = true;
+    return;
+  }
+  cmEditor = CodeMirror.fromTextArea($('#codeEditor'), {
+    lineNumbers: true,
+    mode: 'javascript',
+    theme: State.settings.editorTheme,
+    indentUnit: 2,
+    tabSize: 2,
+    indentWithTabs: false,
+    lineWrapping: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    styleActiveLine: true,
+    extraKeys: {
+      'Ctrl-S': saveCurrentFile,
+      'Cmd-S': saveCurrentFile,
+      'Ctrl-Enter': runCurrentCode,
+      'Cmd-Enter': runCurrentCode,
+      'Ctrl-/': 'toggleComment',
+      'F5': runCurrentCode,
+      'Ctrl-Space': 'autocomplete'
+    }
+  });
+  cmEditor.on('change', () => {
+    if (State.activeTab >= 0) {
+      State.openTabs[State.activeTab].content = cmEditor.getValue();
+      State.openTabs[State.activeTab].dirty = true;
+      renderTabs();
+      if (State.autoSave) debouncedSave();
+    }
+  });
+  cmEditor.on('cursorActivity', () => {
+    const c = cmEditor.getCursor();
+    $('#statusPos').textContent = `Ln ${c.line + 1}, Col ${c.ch + 1}`;
+  });
+  document.querySelector('.CodeMirror').style.fontSize = State.editorFontSize + 'px';
+  // initial file
+  if (Object.keys(State.currentProject?.files || {}).length === 0) {
+    createFile('index.html', getDefaultContent('htmlmixed'));
+  } else {
+    // open first file
+    const first = Object.keys(State.currentProject.files)[0];
+    openFile(first);
+  }
+  editorReady = true;
+}
+window._initEditor = initEditor;
+
+function fallbackEditor() {
+  const ta = $('#codeEditor');
+  ta.style.cssText = 'width:100%;height:100%;background:var(--bg-primary);color:var(--text-primary);border:none;padding:12px;font-family:monospace;resize:none;outline:none;';
+  ta.classList.remove('hidden');
+}
+
+/* ----- Files ----- */
+function ensureProject() {
+  if (!State.currentProject) {
+    State.currentProject = {
+      id: 'default_' + Date.now(),
+      name: 'مشروع بدون عنوان',
+      files: {},
+      created: Date.now(),
+      updated: Date.now()
+    };
+  }
+}
+
+function createFile(name, content) {
+  ensureProject();
+  content = content || getDefaultContent(detectLang(name));
+  State.currentProject.files[name] = content;
+  State.currentProject.updated = Date.now();
+  renderFileList();
+  openFile(name);
+  scheduleProjectSave();
+  toast('تم إنشاء الملف: ' + name, 'success');
+}
+
+function openFile(name) {
+  if (!State.currentProject || !(name in State.currentProject.files)) return;
+  // already open?
+  let idx = State.openTabs.findIndex(t => t.name === name);
+  if (idx === -1) {
+    State.openTabs.push({ name, content: State.currentProject.files[name], lang: detectLang(name), dirty: false });
+    idx = State.openTabs.length - 1;
+  }
+  switchTab(idx);
+}
+
+function switchTab(idx) {
+  if (idx < 0 || idx >= State.openTabs.length) return;
+  State.activeTab = idx;
+  const tab = State.openTabs[idx];
+  if (cmEditor) {
+    cmEditor.setValue(tab.content);
+    cmEditor.setOption('mode', tab.lang || detectLang(tab.name));
+  } else {
+    $('#codeEditor').value = tab.content;
+  }
+  const sel = $('#langSelect');
+  if (sel) {
+    const opts = Array.from(sel.options).map(o => o.value);
+    sel.value = opts.includes(tab.lang) ? tab.lang : 'auto';
+  }
+  renderTabs();
+  renderFileList();
+  $('#statusFile').textContent = tab.name;
+}
+
+function renderTabs() {
+  const el = $('#tabs');
+  if (!el) return;
+  el.innerHTML = '';
+  State.openTabs.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab' + (i === State.activeTab ? ' active' : '');
+    b.innerHTML = `${t.dirty ? '● ' : ''}${t.name}<span class="close" data-i="${i}">✕</span>`;
+    b.onclick = (e) => {
+      if (e.target.classList.contains('close')) {
+        closeTab(+e.target.dataset.i);
+      } else switchTab(i);
+    };
+    el.appendChild(b);
+  });
+}
+
+function closeTab(i) {
+  const t = State.openTabs[i];
+  if (t && t.dirty) {
+    showModal(`
+      <h3>تعديلات غير محفوظة</h3>
+      <p style="color:var(--text-secondary);">الملف "${t.name}" يحتوي على تعديلات غير محفوظة. هل تريد حفظها؟</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal(); _closeTabNoSave(${i})">تجاهل</button>
+        <button class="btn primary" onclick="closeModal(); _closeTabSave(${i})">حفظ وإغلاق</button>
+      </div>
+    `);
+    return;
+  }
+  _closeTabNoSave(i);
+}
+window._closeTabNoSave = function(i) {
+  State.openTabs.splice(i, 1);
+  if (State.activeTab >= State.openTabs.length) State.activeTab = State.openTabs.length - 1;
+  if (State.activeTab >= 0) switchTab(State.activeTab);
+  else { if (cmEditor) cmEditor.setValue(''); renderTabs(); }
+};
+window._closeTabSave = function(i) {
+  const t = State.openTabs[i];
+  if (t) {
+    State.currentProject.files[t.name] = t.content;
+    t.dirty = false;
+    scheduleProjectSave();
+  }
+  _closeTabNoSave(i);
+};
+
+function renderFileList() {
+  const el = $('#fileList');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!State.currentProject) return;
+  Object.keys(State.currentProject.files).forEach(name => {
+    const d = document.createElement('div');
+    d.className = 'file-item' + (State.openTabs[State.activeTab]?.name === name ? ' active' : '');
+    const icon = fileIcon(name);
+    d.innerHTML = `${icon} <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${name}</span><span class="del" data-name="${name}">✕</span>`;
+    d.onclick = (e) => {
+      if (e.target.classList.contains('del')) {
+        e.stopPropagation();
+        deleteFile(name);
+      } else openFile(name);
+    };
+    el.appendChild(d);
+  });
+}
+
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const colors = { html:'#e34c26', css:'#264de4', js:'#f0db4f', ts:'#3178c6', py:'#3776ab', java:'#b07219', c:'#555', cpp:'#f34b7d', cs:'#178600', php:'#777bb4', sql:'#e38c00', json:'#cbcb41', xml:'#f1662a', md:'#083fa1', go:'#00add8', rs:'#dea584', kt:'#A97BFF' };
+  const c = colors[ext] || '#8891b5';
+  return `<i class="fas fa-file-code" style="color:${c}; font-size:11px;"></i>`;
+}
+
+function deleteFile(name) {
+  showModal(`
+    <h3>حذف الملف؟</h3>
+    <p style="color:var(--text-secondary);">سيتم حذف "${name}" نهائياً من المشروع.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn danger" onclick="closeModal(); _doDeleteFile('${name.replace(/'/g,"\\'")}')">حذف</button>
+    </div>
+  `);
+}
+window._doDeleteFile = function(name) {
+  delete State.currentProject.files[name];
+  const idx = State.openTabs.findIndex(t => t.name === name);
+  if (idx >= 0) _closeTabNoSave(idx);
+  State.currentProject.updated = Date.now();
+  renderFileList();
+  scheduleProjectSave();
+  toast('تم الحذف', 'success');
+};
+
+let saveTimer = null;
+function scheduleProjectSave() {
+  if (!State.autoSave) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistProject, 1000);
+}
+async function persistProject() {
+  if (!State.currentProject) return;
+  try {
+    setStatus(t('saving'), 'busy');
+    // sync open tabs to files
+    State.openTabs.forEach(t => { State.currentProject.files[t.name] = t.content; t.dirty = false; });
+    State.currentProject.updated = Date.now();
+    await DB.saveProject(JSON.parse(JSON.stringify(State.currentProject)));
+    await DB.setKV('lastProject', State.currentProject.id);
+    renderTabs();
+    setStatus(t('saved'));
+  } catch(e) {
+    setStatus('خطأ في الحفظ', 'error');
+    console.warn(e);
+  }
+}
+window.debouncedSave = scheduleProjectSave;
+
+async function saveCurrentFile() {
+  await persistProject();
+  toast('تم الحفظ', 'success');
+}
+window.saveCurrentFile = saveCurrentFile;
+
+$('#saveFileBtn')?.addEventListener('click', saveCurrentFile);
+$('#saveAllBtn')?.addEventListener('click', async () => { await persistProject(); toast('تم حفظ كل شيء', 'success'); });
+
+$('#newFileBtn')?.addEventListener('click', () => {
+  showModal(`
+    <h3>ملف جديد</h3>
+    <div class="field"><label>اسم الملف (مع الامتداد)</label><input class="input" id="mFileName" placeholder="script.js" value="script.js" autofocus></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn primary" onclick="doCreateFile()">إنشاء</button>
+    </div>
+  `);
+});
+window.doCreateFile = function() {
+  const name = $('#mFileName').value.trim();
+  if (!name) return toast('اسم غير صالح', 'error');
+  if (State.currentProject && State.currentProject.files[name] !== undefined) return toast('الملف موجود مسبقاً', 'warn');
+  createFile(name, getDefaultContent(detectLang(name)));
+  closeModal();
+};
+
+$('#importFileBtn')?.addEventListener('click', () => {
+  const inp = $('#hiddenFileInput');
+  inp.onchange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    ensureProject();
+    for (const f of files) {
+      const text = await f.text();
+      State.currentProject.files[f.name] = text;
+    }
+    renderFileList();
+    scheduleProjectSave();
+    toast(`تم استيراد ${files.length} ملف`, 'success');
+    inp.value = '';
+  };
+  inp.click();
+});
+
+$('#downloadFileBtn')?.addEventListener('click', () => {
+  const tab = State.openTabs[State.activeTab];
+  if (!tab) return;
+  downloadText(tab.content, tab.name);
+});
+
+function downloadText(text, filename) {
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+$('#langSelect')?.addEventListener('change', (e) => {
+  const lang = e.target.value;
+  const tab = State.openTabs[State.activeTab];
+  if (!tab) return;
+  if (lang === 'auto') tab.lang = detectLang(tab.name);
+  else tab.lang = lang;
+  if (cmEditor) cmEditor.setOption('mode', tab.lang);
+});
+
+$('#searchBtn')?.addEventListener('click', () => {
+  if (cmEditor) {
+    cmEditor.execCommand('find');
+  } else {
+    toast('البحث غير متاح في الوضع الاحتياطي', 'warn');
+  }
+});
+
+$('#togglePreviewBtn')?.addEventListener('click', () => {
+  $('#previewPane').classList.toggle('hidden');
+  if (!$('#previewPane').classList.contains('hidden')) runCurrentCode();
+});
+$('#closePreview')?.addEventListener('click', () => $('#previewPane').classList.add('hidden'));
+$('#refreshPreview')?.addEventListener('click', runCurrentCode);
+$('#toggleConsoleBtn')?.addEventListener('click', () => $('#consolePane').classList.toggle('show'));
+$('#runBtn')?.addEventListener('click', runCurrentCode);
+
+/* ----- Console ----- */
+function consoleLog(type, args) {
+  const pane = $('#consolePane');
+  pane.classList.add('show');
+  const line = document.createElement('div');
+  line.className = 'console-line ' + type;
+  line.textContent = args.map(a => {
+    try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch(_) { return String(a); }
+  }).join(' ');
+  pane.appendChild(line);
+  pane.scrollTop = pane.scrollHeight;
+}
+
+/* ----- Running code ----- */
+let pyodide = null;
+let pyodideLoading = false;
+
+async function runCurrentCode() {
+  const tab = State.openTabs[State.activeTab];
+  if (!tab) return toast('لا يوجد ملف نشط', 'warn');
+
+  const lang = tab.lang || detectLang(tab.name);
+  const preview = $('#previewFrame');
+
+  // Clear console
+  $('#consolePane').innerHTML = '';
+  $('#consolePane').classList.add('show');
+  setStatus('جاري التشغيل...', 'busy');
+
+  // HTML/CSS/JS
+  if (lang === 'htmlmixed') {
+    // Collect CSS and JS files if present
+    const proj = State.currentProject;
+    let html = tab.content;
+    // inject linked css & js from project if referenced by name
+    Object.keys(proj.files).forEach(fname => {
+      if (fname.endsWith('.css') && html.includes(fname)) {
+        html = html.replace(fname, ''); // we inject directly
+      }
+    });
+    // Build combined
+    let extraCss = '';
+    let extraJs = '';
+    Object.keys(proj.files).forEach(fname => {
+      if (fname.endsWith('.css')) extraCss += `\n/* ${fname} */\n` + proj.files[fname];
+      if (fname.endsWith('.js')) extraJs += `\n/* ${fname} */\n` + proj.files[fname];
+    });
+    if (extraCss && !html.includes('<style')) {
+      html = html.replace('</head>', `<style>${extraCss}</style></head>`);
+    }
+    if (extraJs && !html.includes('<script')) {
+      html = html.replace('</body>', `<script>${extraJs}<\/script></body>`);
+    }
+    // Inject console interceptor
+    const intercept = `<script>
+    (function(){
+      const _log = console.log, _warn = console.warn, _err = console.error;
+      const send = (t,args)=>{ try{ parent.postMessage({__nexus:true,type:t,args:args.map(a=>{try{return typeof a==='object'?JSON.stringify(a):String(a)}catch(e){return String(a)}})},'*'); }catch(e){} };
+      console.log=(...a)=>{send('log',a);_log.apply(console,a)};
+      console.warn=(...a)=>{send('warn',a);_warn.apply(console,a)};
+      console.error=(...a)=>{send('error',a);_err.apply(console,a)};
+      window.onerror=(m,s,l,c,e)=>{send('error',[m+' @'+l+':'+c]);};
+    })();
+    <\/script>`;
+    html = html.replace('<head>', '<head>' + intercept);
+    html = html.replace('<head>', `<head><base target="_blank">`);
+    preview.srcdoc = html;
+    $('#previewPane').classList.remove('hidden');
+    consoleLog('log', ['[Preview] تم تحديث المعاينة']);
+    setStatus('تم التشغيل');
+    toast('تم التشغيل في المعاينة', 'success');
+    return;
+  }
+
+  // CSS or JS standalone
+  if (lang === 'css' || lang === 'javascript') {
+    const isJs = lang === 'javascript';
+    const wrapper = isJs
+      ? `<!DOCTYPE html><html><head><base target="_blank"></head><body><div id="app" style="padding:20px;font-family:sans-serif;">(نتيجة JS تظهر في Console)</div><script>
+        (function(){const _log=console.log;console.log=(...a)=>{try{parent.postMessage({__nexus:true,type:'log',args:a.map(x=>{try{return typeof x==='object'?JSON.stringify(x):String(x)}catch(e){return String(x)}})},'*')}catch(e){};_log.apply(console,a)};window.onerror=(m,s,l,c)=>{try{parent.postMessage({__nexus:true,type:'error',args:[m+' @'+l+':'+c]},'*')}catch(e){}};})();
+        ${tab.content}
+      <\/script></body></html>`
+      : `<!DOCTYPE html><html><head><base target="_blank"><style>${tab.content}</style></head><body><h1>CSS Preview</h1><p>هذا مثال لتطبيق CSS الخاص بك.</p><button>زر</button></body></html>`;
+    preview.srcdoc = wrapper;
+    $('#previewPane').classList.remove('hidden');
+    setStatus('تم التشغيل');
+    return;
+  }
+
+  // Python
+  if (lang === 'python') {
+    await runPython(tab.content);
+    return;
+  }
+
+  // Other languages: no execution
+  const supported = ['htmlmixed','css','javascript','python'];
+  consoleLog('warn', [`اللغة "${lang}" مدعومة للتحرير فقط.`]);
+  consoleLog('warn', ['لا يوجد مترجم/بيئة تشغيل متوفرة داخل المتصفح لهذه اللغة.']);
+  toast('هذه اللغة مدعومة للتحرير فقط', 'warn');
+  setStatus('لغة غير قابلة للتشغيل محلياً', 'error');
+}
+
+async function runPython(code) {
+  if (typeof loadPyodide === 'undefined' && !pyodide) {
+    // try to load Pyodide from CDN
+    if (!navigator.onLine) {
+      consoleLog('error', ['Python يحتاج اتصال بالإنترنت لتحميل Pyodide.']);
+      toast('لا يوجد اتصال بالإنترنت لتحميل Pyodide', 'error');
+      return;
+    }
+    consoleLog('log', ['جاري تحميل بيئة Python (Pyodide)...']);
+    setStatus('تحميل Pyodide...', 'busy');
+    try {
+      await loadScript('https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js');
+    } catch(e) {
+      consoleLog('error', ['فشل تحميل Pyodide: ' + e.message]);
+      toast('فشل تحميل Pyodide', 'error');
+      setStatus('فشل التحميل', 'error');
+      return;
+    }
+  }
+  try {
+    if (!pyodide) {
+      pyodide = await window.loadPyodide({
+        stdout: (s) => consoleLog('log', [s]),
+        stderr: (s) => consoleLog('error', [s])
+      });
+      consoleLog('log', ['تم تحميل Python بنجاح.']);
+    }
+    setStatus('تشغيل Python...', 'busy');
+    await pyodide.runPythonAsync(code);
+    setStatus('تم التشغيل');
+    toast('تم تشغيل Python', 'success');
+  } catch(e) {
+    consoleLog('error', [String(e)]);
+    setStatus('خطأ', 'error');
+  }
+}
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = res;
+    s.onerror = () => rej(new Error('فشل تحميل: ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if (d && d.__nexus) {
+    consoleLog(d.type, d.args);
+  }
+});
+
+/* Keyboard shortcuts (global) */
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    if (State.view === 'codelab') saveCurrentFile();
+    else persistProject();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (State.view === 'codelab') { e.preventDefault(); runCurrentCode(); }
+  }
+  if (e.key === 'F5' && State.view === 'codelab') {
+    e.preventDefault(); runCurrentCode();
+  }
+});
+
+/* ==========================================================================
+   Image Lab
+   ========================================================================== */
+const IL = {
+  canvas: null, ctx: null,
+  layers: [],
+  activeLayer: -1,
+  history: [],
+  historyIdx: -1,
+  dragging: false,
+  dragOffX: 0, dragOffY: 0,
+  initialized: false,
+  baseImage: null
+};
+
+function initImageLab() {
+  if (IL.initialized) return;
+  IL.canvas = $('#ilCanvas');
+  IL.ctx = IL.canvas.getContext('2d');
+  IL.canvas.style.background = '#1a2145';
+  drawIL();
+  bindILEvents();
+  IL.initialized = true;
+}
+
+function bindILEvents() {
+  $('#ilImport').onclick = () => {
+    const inp = $('#hiddenImageInput');
+    inp.onchange = (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          IL.canvas.width = img.width;
+          IL.canvas.height = img.height;
+          IL.layers = [{ type: 'image', img, x: 0, y: 0, w: img.width, h: img.height, opacity: 1, visible: true, name: 'صورة أساسية' }];
+          IL.activeLayer = 0;
+          pushHistory();
+          drawIL();
+          renderLayers();
+          toast('تم استيراد الصورة', 'success');
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(f);
+      inp.value = '';
+    };
+    inp.click();
+  };
+
+  $('#ilNew').onclick = () => {
+    showModal(`
+      <h3>لوحة جديدة</h3>
+      <div class="field"><label>العرض (px)</label><input type="number" class="input" id="ilNewW" value="800" min="100" max="4000"></div>
+      <div class="field"><label>الارتفاع (px)</label><input type="number" class="input" id="ilNewH" value="500" min="100" max="4000"></div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">إلغاء</button>
+        <button class="btn primary" onclick="ilNewCanvas()">إنشاء</button>
+      </div>
+    `);
+  };
+  window.ilNewCanvas = () => {
+    const w = +$('#ilNewW').value, h = +$('#ilNewH').value;
+    IL.canvas.width = w; IL.canvas.height = h;
+    IL.layers = [];
+    IL.activeLayer = -1;
+    pushHistory();
+    drawIL();
+    renderLayers();
+    closeModal();
+    toast('لوحة جديدة', 'success');
+  };
+
+  $('#ilAddText').onclick = () => addLayer({
+    type: 'text', text: 'نص جديد', x: 100, y: 100, size: 32, color: '#ffffff',
+    font: "'Cairo', sans-serif", opacity: 1, rotation: 0, visible: true, name: 'نص'
+  });
+  $('#ilAddRect').onclick = () => addLayer({
+    type: 'rect', x: 100, y: 100, w: 200, h: 100, fill: State.settings.accent,
+    opacity: 1, rotation: 0, visible: true, name: 'مستطيل'
+  });
+  $('#ilAddCircle').onclick = () => addLayer({
+    type: 'circle', x: 150, y: 150, r: 80, fill: State.settings.accent2,
+    opacity: 1, rotation: 0, visible: true, name: 'دائرة'
+  });
+  $('#ilAddTriangle').onclick = () => addLayer({
+    type: 'triangle', x: 100, y: 100, w: 150, h: 130, fill: '#f59e0b',
+    opacity: 1, rotation: 0, visible: true, name: 'مثلث'
+  });
+
+  $('#ilColor').oninput = (e) => {
+    const l = IL.layers[IL.activeLayer];
+    if (!l) return;
+    if (l.type === 'text') l.color = e.target.value;
+    else l.fill = e.target.value;
+    drawIL(); pushHistoryDebounced();
+  };
+  $('#ilFontSize').oninput = (e) => {
+    const l = IL.layers[IL.activeLayer];
+    if (l && l.type === 'text') { l.size = +e.target.value; drawIL(); pushHistoryDebounced(); }
+  };
+  $('#ilOpacity').oninput = (e) => {
+    const l = IL.layers[IL.activeLayer];
+    if (l) { l.opacity = +e.target.value / 100; drawIL(); pushHistoryDebounced(); }
+  };
+  $('#ilRotate').oninput = (e) => {
+    const l = IL.layers[IL.activeLayer];
+    if (l) { l.rotation = +e.target.value; drawIL(); pushHistoryDebounced(); }
+  };
+  $('#ilBrightness').oninput = (e) => {
+    const l = IL.layers[IL.activeLayer];
+    if (l && l.type === 'image') { l.brightness = +e.target.value / 100; drawIL(); pushHistoryDebounced(); }
+  };
+
+  // layer operations
+  $('#ilLayerUp').onclick = () => moveLayer(1);
+  $('#ilLayerDown').onclick = () => moveLayer(-1);
+  $('#ilLayerDup').onclick = () => {
+    const l = IL.layers[IL.activeLayer];
+    if (!l) return;
+    const copy = JSON.parse(JSON.stringify(l));
+    copy.x += 20; copy.y += 20;
+    IL.layers.splice(IL.activeLayer + 1, 0, copy);
+    IL.activeLayer++;
+    drawIL(); renderLayers(); pushHistory();
+  };
+  $('#ilLayerDel').onclick = () => {
+    if (IL.activeLayer < 0) return;
+    IL.layers.splice(IL.activeLayer, 1);
+    IL.activeLayer = Math.min(IL.activeLayer, IL.layers.length - 1);
+    drawIL(); renderLayers(); pushHistory();
+  };
+
+  $('#ilUndo').onclick = undoIL;
+  $('#ilRedo').onclick = redoIL;
+
+  $('#ilExportPng').onclick = () => exportIL('png');
+  $('#ilExportJpg').onclick = () => exportIL('jpeg');
+
+  $$('.il-tpl').forEach(b => b.onclick = () => loadTemplate(b.dataset.tpl));
+
+  // mouse / touch
+  const c = IL.canvas;
+  const getPos = (e) => {
+    const r = c.getBoundingClientRect();
+    const scaleX = c.width / r.width;
+    const scaleY = c.height / r.height;
+    const px = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    const py = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+    return { x: px * scaleX, y: py * scaleY };
+  };
+  const startDrag = (e) => {
+    const p = getPos(e);
+    // find topmost layer hit
+    for (let i = IL.layers.length - 1; i >= 0; i--) {
+      const l = IL.layers[i];
+      if (!l.visible) continue;
+      if (hitLayer(l, p.x, p.y)) {
+        IL.activeLayer = i;
+        IL.dragging = true;
+        IL.dragOffX = p.x - l.x;
+        IL.dragOffY = p.y - l.y;
+        renderLayers();
+        syncILControls();
+        e.preventDefault();
+        return;
+      }
+    }
+  };
+  const moveDrag = (e) => {
+    if (!IL.dragging) return;
+    const l = IL.layers[IL.activeLayer];
+    if (!l) return;
+    const p = getPos(e);
+    l.x = p.x - IL.dragOffX;
+    l.y = p.y - IL.dragOffY;
+    drawIL();
+    e.preventDefault();
+  };
+  const endDrag = () => {
+    if (IL.dragging) { IL.dragging = false; pushHistory(); }
+  };
+  c.addEventListener('mousedown', startDrag);
+  c.addEventListener('mousemove', moveDrag);
+  c.addEventListener('mouseup', endDrag);
+  c.addEventListener('touchstart', startDrag, { passive: false });
+  c.addEventListener('touchmove', moveDrag, { passive: false });
+  c.addEventListener('touchend', endDrag);
+}
+
+function hitLayer(l, x, y) {
+  if (l.type === 'text') {
+    const w = (l.text.length * l.size * 0.6);
+    const h = l.size * 1.2;
+    return x >= l.x && x <= l.x + w && y >= l.y - l.size && y <= l.y + h;
+  }
+  if (l.type === 'rect') return x >= l.x && x <= l.x + l.w && y >= l.y && y <= l.y + l.h;
+  if (l.type === 'circle') return Math.hypot(x - l.x, y - l.y) <= l.r;
+  if (l.type === 'triangle') return x >= l.x && x <= l.x + l.w && y >= l.y && y <= l.y + l.h;
+  if (l.type === 'image') return x >= l.x && x <= l.x + l.w && y >= l.y && y <= l.y + l.h;
+  return false;
+}
+
+function addLayer(l) {
+  IL.layers.push(l);
+  IL.activeLayer = IL.layers.length - 1;
+  drawIL(); renderLayers(); pushHistory();
+  syncILControls();
+}
+
+function moveLayer(dir) {
+  const i = IL.activeLayer;
+  const j = i + dir;
+  if (j < 0 || j >= IL.layers.length) return;
+  [IL.layers[i], IL.layers[j]] = [IL.layers[j], IL.layers[i]];
+  IL.activeLayer = j;
+  drawIL(); renderLayers(); pushHistory();
+}
+
+function drawIL() {
+  const ctx = IL.ctx;
+  const c = IL.canvas;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  IL.layers.forEach((l, i) => {
+    if (!l.visible) return;
+    ctx.save();
+    ctx.globalAlpha = l.opacity ?? 1;
+    if (l.rotation) {
+      const cx = l.x + (l.w || 0) / 2;
+      const cy = l.y + (l.h || 0) / 2;
+      ctx.translate(cx, cy);
+      ctx.rotate(l.rotation * Math.PI / 180);
+      ctx.translate(-cx, -cy);
+    }
+    if (l.type === 'image' && l.img) {
+      if (l.brightness !== undefined && l.brightness !== 1) {
+        ctx.filter = `brightness(${l.brightness})`;
+      }
+      ctx.drawImage(l.img, l.x, l.y, l.w, l.h);
+      ctx.filter = 'none';
+    } else if (l.type === 'text') {
+      ctx.fillStyle = l.color;
+      ctx.font = `bold ${l.size}px ${l.font}`;
+      ctx.textBaseline = 'top';
+      ctx.fillText(l.text, l.x, l.y);
+    } else if (l.type === 'rect') {
+      ctx.fillStyle = l.fill;
+      ctx.fillRect(l.x, l.y, l.w, l.h);
+    } else if (l.type === 'circle') {
+      ctx.fillStyle = l.fill;
+      ctx.beginPath();
+      ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (l.type === 'triangle') {
+      ctx.fillStyle = l.fill;
+      ctx.beginPath();
+      ctx.moveTo(l.x + l.w / 2, l.y);
+      ctx.lineTo(l.x + l.w, l.y + l.h);
+      ctx.lineTo(l.x, l.y + l.h);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // active border
+    if (i === IL.activeLayer && !IL.dragging) {
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 2;
+      const bb = layerBBox(l);
+      ctx.strokeRect(bb.x - 4, bb.y - 4, bb.w + 8, bb.h + 8);
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+  });
+}
+
+function layerBBox(l) {
+  if (l.type === 'text') {
+    const w = l.text.length * l.size * 0.6;
+    return { x: l.x, y: l.y, w, h: l.size * 1.2 };
+  }
+  if (l.type === 'circle') return { x: l.x - l.r, y: l.y - l.r, w: l.r * 2, h: l.r * 2 };
+  return { x: l.x, y: l.y, w: l.w || 0, h: l.h || 0 };
+}
+
+function renderLayers() {
+  const el = $('#ilLayers');
+  if (!el) return;
+  el.innerHTML = '';
+  // render reversed (top layer first visually)
+  for (let i = IL.layers.length - 1; i >= 0; i--) {
+    const l = IL.layers[i];
+    const d = document.createElement('div');
+    d.className = 'layer-item' + (i === IL.activeLayer ? ' active' : '');
+    d.innerHTML = `
+      <i class="fas fa-${l.visible ? 'eye' : 'eye-slash'}" data-vis="${i}" style="cursor:pointer;font-size:11px;"></i>
+      <span class="lname">${l.name || l.type}</span>
+    `;
+    d.onclick = (e) => {
+      if (e.target.dataset.vis !== undefined) {
+        IL.layers[i].visible = !IL.layers[i].visible;
+        drawIL(); renderLayers(); pushHistory();
+      } else {
+        IL.activeLayer = i;
+        renderLayers(); syncILControls(); drawIL();
+      }
+    };
+    el.appendChild(d);
+  }
+}
+
+function syncILControls() {
+  const l = IL.layers[IL.activeLayer];
+  if (!l) return;
+  $('#ilOpacity').value = Math.round((l.opacity ?? 1) * 100);
+  $('#ilRotate').value = l.rotation || 0;
+  if (l.type === 'text') {
+    $('#ilColor').value = l.color;
+    $('#ilFontSize').value = l.size;
+  } else if (l.fill) {
+    $('#ilColor').value = l.fill;
+  }
+}
+
+/* History */
+let ilHistTimer = null;
+function pushHistoryDebounced() {
+  clearTimeout(ilHistTimer);
+  ilHistTimer = setTimeout(pushHistory, 400);
+}
+function pushHistory() {
+  const snap = JSON.stringify({ layers: IL.layers.map(l => ({ ...l, img: undefined, __img: l.type === 'image' })) });
+  // to preserve images keep a separate array
+  const data = {
+    layers: IL.layers.map(l => {
+      const c = { ...l };
+      if (l.img) { c.__imgSrc = l.img.src; delete c.img; }
+      return c;
+    })
+  };
+  IL.history = IL.history.slice(0, IL.historyIdx + 1);
+  IL.history.push(data);
+  if (IL.history.length > 50) IL.history.shift();
+  IL.historyIdx = IL.history.length - 1;
+}
+async function restoreSnapshot(s) {
+  const newLayers = await Promise.all(s.layers.map(l => new Promise(res => {
+    if (l.__imgSrc) {
+      const img = new Image();
+      img.onload = () => { const c = { ...l, img }; delete c.__imgSrc; res(c); };
+      img.onerror = () => res(l);
+      img.src = l.__imgSrc;
+    } else res(l);
+  })));
+  IL.layers = newLayers;
+  IL.activeLayer = Math.min(IL.activeLayer, IL.layers.length - 1);
+  drawIL(); renderLayers();
+}
+function undoIL() {
+  if (IL.historyIdx <= 0) return;
+  IL.historyIdx--;
+  restoreSnapshot(IL.history[IL.historyIdx]);
+}
+function redoIL() {
+  if (IL.historyIdx >= IL.history.length - 1) return;
+  IL.historyIdx++;
+  restoreSnapshot(IL.history[IL.historyIdx]);
+}
+
+function exportIL(fmt) {
+  showModal(`
+    <h3>تصدير ${fmt.toUpperCase()}</h3>
+    <div class="field"><label>الجودة (0.1 - 1)</label><input type="number" class="input" id="ilQ" value="0.95" min="0.1" max="1" step="0.05"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn primary" onclick="doExportIL('${fmt}')">تصدير</button>
+    </div>
+  `);
+}
+window.doExportIL = function(fmt) {
+  const q = Math.max(0.1, Math.min(1, +$('#ilQ').value || 0.95));
+  const mime = fmt === 'png' ? 'image/png' : 'image/jpeg';
+  IL.canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'nexus-design.' + (fmt === 'jpeg' ? 'jpg' : 'png');
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    toast('تم التصدير', 'success');
+    closeModal();
+  }, mime, q);
+};
+
+function loadTemplate(tpl) {
+  const c = IL.canvas;
+  if (tpl === 'youtube') { c.width = 1280; c.height = 720; }
+  else if (tpl === 'insta') { c.width = 1080; c.height = 1080; }
+  else if (tpl === 'poster') { c.width = 800; c.height = 1200; }
+  else if (tpl === 'logo') { c.width = 512; c.height = 512; }
+  IL.layers = [
+    { type: 'rect', x: 0, y: 0, w: c.width, h: c.height, fill: State.settings.bg, opacity: 1, visible: true, name: 'خلفية' },
+    { type: 'text', text: 'NEXUS STUDIO', x: 60, y: c.height / 2 - 40, size: Math.round(c.width / 18), color: '#fff', font: "'Cairo', sans-serif", opacity: 1, visible: true, name: 'عنوان' }
+  ];
+  IL.activeLayer = 1;
+  drawIL(); renderLayers(); pushHistory();
+  toast('تم تحميل قالب ' + tpl, 'success');
+}
+window._initImageLab = initImageLab;
+
+/* ==========================================================================
+   Projects Manager
+   ========================================================================== */
+async function renderProjects() {
+  try {
+    const list = await DB.listProjects();
+    const grid = $('#projectsGrid');
+    if (!grid) return;
+    if (!list.length) {
+      grid.innerHTML = `<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);">
+        <i class="fas fa-folder-open" style="font-size:32px;opacity:0.5;"></i>
+        <p style="margin-top:10px;">لا توجد مشاريع محفوظة بعد</p>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = '';
+    list.sort((a, b) => (b.updated || 0) - (a.updated || 0)).forEach(p => {
+      const fileCount = Object.keys(p.files || {}).length;
+      const d = new Date(p.updated || Date.now());
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3 style="margin-bottom:6px;"><i class="fas fa-project-diagram" style="color:var(--accent-violet-2);"></i> ${escapeHtml(p.name || 'بدون عنوان')}</h3>
+        <p style="font-size:12px;color:var(--text-secondary);">${fileCount} ملف • ${d.toLocaleString('ar-EG')}</p>
+        <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn sm primary" data-open="${p.id}"><i class="fas fa-folder-open"></i> فتح</button>
+          <button class="btn sm" data-ren="${p.id}"><i class="fas fa-edit"></i></button>
+          <button class="btn sm danger" data-del="${p.id}"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProject(b.dataset.open));
+    grid.querySelectorAll('[data-ren]').forEach(b => b.onclick = () => renameProject(b.dataset.ren));
+    grid.querySelectorAll('[data-del]').forEach(b => b.onclick = () => delProject(b.dataset.del));
+  } catch(e) { console.warn(e); }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+async function openProject(id) {
+  const p = await DB.getProject(id);
+  if (!p) return toast('المشروع غير موجود', 'error');
+  State.currentProject = p;
+  State.openTabs = [];
+  State.activeTab = -1;
+  if (cmEditor) cmEditor.setValue('');
+  renderFileList();
+  if (Object.keys(p.files || {}).length) {
+    const first = Object.keys(p.files)[0];
+    openFile(first);
+  } else {
+    createFile('index.html');
+  }
+  setView('codelab');
+  toast('تم فتح المشروع: ' + p.name, 'success');
+}
+
+function renameProject(id) {
+  showModal(`
+    <h3>إعادة التسمية</h3>
+    <div class="field"><input class="input" id="renName" placeholder="اسم جديد"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn primary" onclick="doRename('${id}')">حفظ</button>
+    </div>
+  `);
+  window.doRename = async (pid) => {
+    const name = $('#renName').value.trim();
+    if (!name) return;
+    const p = await DB.getProject(pid);
+    p.name = name;
+    p.updated = Date.now();
+    await DB.saveProject(p);
+    if (State.currentProject && State.currentProject.id === pid) State.currentProject.name = name;
+    closeModal(); renderProjects(); toast('تم التحديث', 'success');
+  };
+}
+
+function delProject(id) {
+  showModal(`
+    <h3>حذف المشروع؟</h3>
+    <p style="color:var(--text-secondary);">لا يمكن التراجع عن هذه العملية.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn danger" onclick="doDelProject('${id}')">حذف</button>
+    </div>
+  `);
+  window.doDelProject = async (pid) => {
+    await DB.deleteProject(pid);
+    if (State.currentProject && State.currentProject.id === pid) State.currentProject = null;
+    closeModal(); renderProjects(); toast('تم الحذف', 'success');
+  };
+}
+
+/* Backup / Restore */
+$('#pmBackup')?.addEventListener('click', async () => {
+  const list = await DB.listProjects();
+  const data = JSON.stringify({ version: 1, projects: list, exported: new Date().toISOString() }, null, 2);
+  downloadText(data, `nexus-backup-${Date.now()}.json`);
+  toast('تم تنزيل النسخة الاحتياطية', 'success');
+});
+$('#pmRestore')?.addEventListener('click', () => {
+  const inp = $('#hiddenFileInput');
+  inp.onchange = async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!data.projects || !Array.isArray(data.projects)) throw new Error('ملف غير صالح');
+      for (const p of data.projects) await DB.saveProject(p);
+      toast(`تم استعادة ${data.projects.length} مشروع`, 'success');
+      renderProjects();
+    } catch(err) { toast('فشل الاستعادة: ' + err.message, 'error'); }
+    inp.value = '';
+  };
+  inp.click();
+});
+$('#pmNew')?.addEventListener('click', newProjectWizard);
+$('#newProjectBtn')?.addEventListener('click', newProjectWizard);
+
+function newProjectWizard() {
+  showModal(`
+    <h3>مشروع جديد</h3>
+    <div class="field"><label>اسم المشروع</label><input class="input" id="npName" value="مشروعي الجديد" autofocus></div>
+    <div class="field"><label>القالب</label>
+      <select class="input" id="npTpl">
+        <option value="blank">فارغ (index.html)</option>
+        <option value="web">موقع HTML + CSS + JS</option>
+        <option value="python">Python Script</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+      <button class="btn primary" onclick="doNewProject()">إنشاء</button>
+    </div>
+  `);
+}
+window.doNewProject = async () => {
+  const name = $('#npName').value.trim() || 'بدون عنوان';
+  const tpl = $('#npTpl').value;
+  const id = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  const files = {};
+  if (tpl === 'blank') {
+    files['index.html'] = '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>' + name + '</title>\n</head>\n<body>\n  <h1>مرحباً</h1>\n</body>\n</html>';
+  } else if (tpl === 'web') {
+    files['index.html'] = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${name}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>مرحباً من ${name}</h1>
+  <button id="btn">اضغطني</button>
+  <script src="script.js"><\/script>
+</body>
+</html>`;
+    files['style.css'] = `body { font-family: sans-serif; background: #0a0e27; color: #fff; padding: 40px; text-align: center; }
+button { padding: 12px 24px; background: #8b5cf6; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+button:hover { background: #a78bfa; }`;
+    files['script.js'] = `document.getElementById('btn').addEventListener('click', () => {
+  alert('تم الضغط!');
+  console.log('Button clicked');
+});`;
+  } else if (tpl === 'python') {
+    files['main.py'] = 'print("Hello from NEXUS STUDIO")\nname = "World"\nprint(f"Hello, {name}!")\n';
+  }
+  const p = { id, name, files, created: Date.now(), updated: Date.now() };
+  await DB.saveProject(p);
+  closeModal();
+  await openProject(id);
+  toast('تم إنشاء المشروع', 'success');
+};
+
+/* ==========================================================================
+   Home actions
+   ========================================================================== */
+$$('.action-card').forEach(c => c.addEventListener('click', async () => {
+  const a = c.dataset.action;
+  if (a === 'new-project') newProjectWizard();
+  else if (a === 'open-project') setView('projects');
+  else if (a === 'import-files') {
+    setView('codelab');
+    setTimeout(() => $('#importFileBtn').click(), 200);
+  }
+  else if (a === 'go-codelab') setView('codelab');
+  else if (a === 'go-imagelab') setView('imagelab');
+  else if (a === 'go-settings') setView('settings');
+}));
+
+/* ==========================================================================
+   Initialize
+   ========================================================================== */
+(async function init() {
+  loadSettings();
+  applyTheme();
+  applyLang();
+  bindSettings();
+
+  try {
+    await DB.init();
+  } catch(e) {
+    console.warn('IndexedDB init failed', e);
+    toast('لا يمكن تهيئة التخزين المحلي', 'error');
+  }
+
+  // recent projects on home
+  try {
+    const list = await DB.listProjects();
+    if (list.length) {
+      const grid = $('#recentProjects');
+      grid.innerHTML = '';
+      list.sort((a,b) => (b.updated||0) - (a.updated||0)).slice(0, 6).forEach(p => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.innerHTML = `<h3>${escapeHtml(p.name)}</h3><p style="font-size:12px;color:var(--text-secondary);">${Object.keys(p.files||{}).length} ملف</p>`;
+        d.onclick = () => openProject(p.id);
+        d.style.cursor = 'pointer';
+        grid.appendChild(d);
+      });
+    }
+  } catch(e) {}
+
+  // Try to load last project into editor
+  try {
+    const lastId = await DB.getKV('lastProject');
+    if (lastId) {
+      const p = await DB.getProject(lastId);
+      if (p) State.currentProject = p;
+    }
+  } catch(e) {}
+
+  // Try to re-init last project files into editor state (lazy)
+  window._reloadLastProject = function() {
+    if (State.currentProject) {
+      renderFileList();
+      const names = Object.keys(State.currentProject.files || {});
+      if (names.length) openFile(names[0]);
+    }
+  };
+
+  // Defer editor init to first visit
+  let editorInitDone = false;
+  const origSetView = setView;
+  window.setView = function(name) {
+    origSetView(name);
+    if (name === 'codelab' && !editorInitDone) {
+      initEditor();
+      if (State.currentProject) window._reloadLastProject();
+      editorInitDone = true;
+    }
+  };
+  // rebind nav buttons to use window.setView
+  $$('.nav-btn').forEach(b => {
+    b.onclick = () => window.setView(b.dataset.view);
+  });
+
+  // If URL hash points to codelab, go there directly
+  setStatus(t('ready'));
+  console.log('%c NEXUS STUDIO ', 'background: linear-gradient(90deg,#8b5cf6,#34d399); color:#fff; padding:4px 10px; border-radius:4px; font-weight:bold;');
+  console.log('مرحباً! افتح Code Lab للبدء.');
+})();
+
+/* Warn before unload if dirty */
+window.addEventListener('beforeunload', (e) => {
+  const dirty = State.openTabs.some(t => t.dirty);
+  if (dirty) {
+    persistProject();
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+/* Global drag-drop for files */
+document.addEventListener('dragover', e => { e.preventDefault(); });
+document.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  if (State.view !== 'codelab') return;
+  const files = Array.from(e.dataTransfer.files || []);
+  if (!files.length) return;
+  ensureProject();
+  for (const f of files) {
+    if (f.type.startsWith('image/')) continue; // ignore images here
+    try { State.currentProject.files[f.name] = await f.text(); } catch(_) {}
+  }
+  renderFileList(); scheduleProjectSave();
+  toast(`تم استيراد ${files.length} ملف`, 'success');
+});
+</script>
+</body>
+</html>
